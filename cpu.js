@@ -64,44 +64,20 @@ var cpuFactory = function(){
 	}
 	cpu.logic.process = function(block, currentOperation){
 		currentOperation = currentOperation || block.shift();
-		return cpu.logic.operations[currentOperation](block);
+		var valueOne, valueTwo, operationFunction;
+		valueOne = block.shift().join('');
+		if(block.length){ valueTwo = block.shift().join(''); }
+		operationFunction = this.operations[currentOperation];
+		return operationFunction(valueOne, valueTwo);
 	}
 	cpu.logic.operations = {
-		'0001': function(block){
-			var valueOne = block[0].join('');
-			var valueTwo = block[1].join('');
-			return operations.and(valueOne, valueTwo)
-		},
-		'0010': function(block){
-			var valueOne = block[0].join('');
-			var valueTwo = block[1].join('');
-			return operations.or(valueOne, valueTwo)
-		},
-		'0011': function(block){
-			var valueOne = block[0].join('');
-			return operations.not(value)
-		},
-		'0110': function(block){
-			var valueOne = block[0].join('');
-			var valueTwo = block[1].join('');
-			return operations.add(valueOne, valueTwo)
-		},
-		'0100': function(block){
-			var valueOne = block[0].join('');
-			var valueTwo = block[1].join('');
-			return operations.xor(valueOne, valueTwo)
-		},
-		'0111': function(block){
-			var valueOne = block[0].join('');
-			var valueTwo = block[1].join('');
-			return operations.equals(valueOne, valueTwo)
-		},
-		'1010': function(block){
-			var valueOne = block[0].join('');
-			var valueTwo = block[1].join('');
-			return operations.subtract(valueOne, valueTwo)
-		}
-
+		'0001': operations.and,
+		'0010': operations.or,
+		'0011': operations.not,
+		'0110': operations.add,
+		'0100': operations.xor,
+		'0111': operations.equals,
+		'1010': operations.subtract
 	}
 	return cpu;
 }
