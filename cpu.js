@@ -44,10 +44,7 @@ var cpuFactory = function(){
 			var location = block.shift();
 			this.storeAt(location, block)
 		}
-		else if(currentOperation === '0110' ||
-				currentOperation === '0111' ||
-				currentOperation === '1010'
-				){
+		else if(this.logic.operations[currentOperation] !== undefined){
 			var valueOne = this.registerMap[block.shift()];
 			var valueTwo = this.registerMap[block.shift()];
 			var result = this.logic.process([currentOperation, valueOne, valueTwo]);
@@ -55,15 +52,16 @@ var cpuFactory = function(){
 			this.registerMap['0100'].push(result);
 		}
 		else if(currentOperation === '1001'){
+			var location = block.shift();
 			var type = block.shift();
-			virtualConsole.print(type, this.registerMap['0100']);
+			virtualConsole.print(type, this.registerMap[location]);
 		}
-		else if(currentOperation === '1000'){
+		else if(currentOperation === '1111'){
 			this.running = false;
 		}
 	}
-	cpu.logic.process = function(block, currentOperation){
-		currentOperation = currentOperation || block.shift();
+	cpu.logic.process = function(block){
+		currentOperation = block.shift();
 		var valueOne, valueTwo, operationFunction;
 		valueOne = block.shift().join('');
 		if(block.length){ valueTwo = block.shift().join(''); }
@@ -77,6 +75,7 @@ var cpuFactory = function(){
 		'0110': operations.add,
 		'0100': operations.xor,
 		'0111': operations.equals,
+		'1000': operations.greaterThan,
 		'1010': operations.subtract
 	}
 	return cpu;
@@ -94,9 +93,9 @@ var cpuFactory = function(){
  * greaterThan: '1000'
  * print: '1001',
  * subtraction: 1010,
- * end: '1000'
+ * end: '1111'
  */
 
 var cpu = cpuFactory();
-cpu.loadProgram(programs.two);
+cpu.loadProgram(programs.three);
 cpu.start();

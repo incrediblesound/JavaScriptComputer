@@ -7,12 +7,16 @@ var consoleFactory = function(){
 	var virtualConsole = {};
 	virtualConsole.print = function(type, block){
 		var printFunc = this.types[type];
-		var currentByte;
+		var currentByte
+		var value = '';
 		while(block.length){
 			currentByte = block.shift();
-			var value = printFunc(currentByte);
-			console.log(value)
+			if(currentByte.length === 4){
+				currentByte = currentByte + block.shift();
+			}
+			value += printFunc(currentByte);
 		}
+		console.log(value)
 	}
 	virtualConsole.types = {
 		'0000': function(bite){
