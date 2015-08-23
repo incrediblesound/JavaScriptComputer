@@ -45,7 +45,9 @@ var cpuFactory = function(){
 			this.storeAt(location, block)
 		}
 		else if(currentOperation === '0110' ||
-				currentOperation === '0111'){
+				currentOperation === '0111' ||
+				currentOperation === '1010'
+				){
 			var valueOne = this.registerMap[block.shift()];
 			var valueTwo = this.registerMap[block.shift()];
 			var result = this.logic.process([currentOperation, valueOne, valueTwo]);
@@ -66,6 +68,8 @@ var cpuFactory = function(){
 	}
 	cpu.logic.operations = {
 		'0001': function(block){
+			var valueOne = block[0].join('');
+			var valueTwo = block[1].join('');
 			return operations.and(valueOne, valueTwo)
 		},
 		'0010': function(block){
@@ -91,7 +95,13 @@ var cpuFactory = function(){
 			var valueOne = block[0].join('');
 			var valueTwo = block[1].join('');
 			return operations.equals(valueOne, valueTwo)
+		},
+		'1010': function(block){
+			var valueOne = block[0].join('');
+			var valueTwo = block[1].join('');
+			return operations.subtract(valueOne, valueTwo)
 		}
+
 	}
 	return cpu;
 }
@@ -107,6 +117,7 @@ var cpuFactory = function(){
  * equals: '0111'
  * greaterThan: '1000'
  * print: '1001',
+ * subtraction: 1010,
  * end: '1000'
  */
 
