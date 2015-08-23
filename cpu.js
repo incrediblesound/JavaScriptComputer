@@ -1,9 +1,8 @@
 var memoryFactory = require('./memory');
 var operations = require('./operations');
-var binToValue = require('./toValue');
-var valueToBinary = require('./toBinary');
 var os = require('./os')();
-var program_one = require('./programs/program_one');
+var virtualConsole = require('./console/console')();
+var programs = require('./programs/programs');
 
 var cpuFactory = function(){
 	var cpu = {
@@ -45,18 +44,17 @@ var cpuFactory = function(){
 			var location = block.shift();
 			this.storeAt(location, block)
 		}
-		else if(currentOperation === '0110'){
+		else if(currentOperation === '0110' ||
+				currentOperation === '0111'){
 			var valueOne = this.registerMap[block.shift()];
 			var valueTwo = this.registerMap[block.shift()];
-			var sum = this.logic.process([currentOperation, valueOne, valueTwo]);
+			var result = this.logic.process([currentOperation, valueOne, valueTwo]);
 			this.registerMap['0100'] = [];
-			this.registerMap['0100'].push(sum);
+			this.registerMap['0100'].push(result);
 		}
-		else if(currentOperation === '0111'){
+		else if(currentOperation === '1001'){
 			var type = block.shift();
-			if(type === '0000'){
-				console.log(binToValue.numbers[this.registerMap['0100']])
-			}
+			virtualConsole.print(type, this.registerMap['0100']);
 		}
 		else if(currentOperation === '1000'){
 			this.running = false;
@@ -76,7 +74,8 @@ var cpuFactory = function(){
 			return operations.or(valueOne, valueTwo)
 		},
 		'0011': function(block){
-			return operations.not(block[0][0], block[1][0])
+			var valueOne = block[0].join('');
+			return operations.not(value)
 		},
 		'0110': function(block){
 			var valueOne = block[0].join('');
@@ -84,7 +83,14 @@ var cpuFactory = function(){
 			return operations.add(valueOne, valueTwo)
 		},
 		'0100': function(block){
-			return operations.xor(block[0][0], block[1][0])
+			var valueOne = block[0].join('');
+			var valueTwo = block[1].join('');
+			return operations.xor(valueOne, valueTwo)
+		},
+		'0111': function(block){
+			var valueOne = block[0].join('');
+			var valueTwo = block[1].join('');
+			return operations.equals(valueOne, valueTwo)
 		}
 	}
 	return cpu;
@@ -96,14 +102,14 @@ var cpuFactory = function(){
  * or: '0010'
  * not: '0011'
  * xor: '0100'
- * store: '0101',
- * add: '0110',
- * print: '0111',
+ * store: '0101'
+ * add: '0110'
+ * equals: '0111'
+ * greaterThan: '1000'
+ * print: '1001',
  * end: '1000'
- * word: '0001'(word) 'xxxx' length ...letters
- * number: '0000'
  */
 
 var cpu = cpuFactory();
-cpu.loadProgram(program_one);
+cpu.loadProgram(programs.two);
 cpu.start();

@@ -1,25 +1,68 @@
 var isOne = function(char){
 	return char === '1';
 }
-
+// logic //
 var and = function(a, b){
-	var x = 0, y = a.length;
+	var x = 0, y = a.length-1;
 	var returnValue = '';
-	for(x; x < y; x++){
-		if(isOne(a[x]) && isOne(b[x])){
+	for(y; y >= x; y--){
+		if(isOne(a[y]) && isOne(b[y])){
 			returnValue += '1';
 		} else {
 			returnValue += '0';
 		}
 	}
-	return returnValue
+	return returnValue;
 }
 
 var or = function(a, b){
-	var x = 0, y = a.length;
+	var x = 0, y = a.length-1;
 	var returnValue = '';
-	for(x; x < y; x++){
-		if(isOne(a[x]) || isOne(b[x])){
+	for(y; y >= x; y--){
+		if(isOne(a[y]) || isOne(b[y])){
+			returnValue += '1';
+		} else {
+			returnValue += '0';
+		}
+	}
+	return returnValue;
+}
+
+var xnor = function(a, b){
+	var x = 0, y = a.length-1;
+	var returnValue = '';
+	for(y; y >= x; y--){
+		if(isOne(a[y]) && isOne(b[y])){
+			returnValue += '1';
+		}
+		else if(!isOne(a[y]) && !isOne(b[y])){
+			returnValue += '1';
+		}
+		else {
+			returnValue += '0';
+		}
+	}
+	return returnValue;
+}
+var not = function(a){
+	var x = 0, y = a.length-1;
+	var returnValue = '';
+	for(y; y >= x; y++){
+		if(isOne(a[y])){
+			returnValue += '0';
+		} else {
+			returnValue += '1';
+		}
+	}
+	return returnValue
+}
+
+var xor = function(a, b){
+	var x = 0, y = a.length-1;
+	var returnValue = '';
+	for(y; y >= x; y--){
+		if((isOne(a[y]) && !isOne(b[y])) ||
+		   (!isOne(a[y]) && isOne(b[y]))){
 			returnValue += '1';
 		} else {
 			returnValue += '0';
@@ -28,6 +71,11 @@ var or = function(a, b){
 	return returnValue
 }
 
+var setToZero = function(a){
+	return xor(a, a);
+}
+
+// math //
 var add = function(a, b){
 	var x = 0, y = a.length-1;
 	var returnValue = '';
@@ -48,42 +96,35 @@ var add = function(a, b){
 	return returnValue
 }
 
-var not = function(a){
-	var x = 0, y = a.length;
+var greaterThan = function(a, b){
+	var x = 0, y = a.length-1;
 	var returnValue = '';
+	var carry = false;
 	for(x; x < y; x++){
-		if(isOne(a[x])){
-			returnValue += '0';
-		} else {
-			returnValue += '1';
+		if(isOne(a[x]) && !isOne(b[x])){
+			return '11111111';
 		}
 	}
-	return returnValue
+	return '00000000';
 }
 
-var xor = function(a, b){
-	var x = 0, y = a.length;
-	var returnValue = '';
-	for(x; x < y; x++){
-		if((isOne(a[x]) && !isOne(b[x])) ||
-		   (!isOne(a[x]) && isOne(b[x]))){
-			returnValue += '1';
-		} else {
-			returnValue += '0';
-		}
+var equals = function(a, b){
+	var result = xnor(a, b);
+	if(result !== '11111111'){
+		return '00000000';
+	} else {
+		return result;
 	}
-	return returnValue
-}
-
-var setToZero = function(a){
-	return xor(a, a);
 }
 
 module.exports = {
 	and: and,
-	add: add,
 	or: or,
 	xor: xor,
+	xnor: xnor,
 	not: not,
+	add: add,
+	greaterThan: greaterThan,
+	equals: equals,
 	setToZero: setToZero
 }

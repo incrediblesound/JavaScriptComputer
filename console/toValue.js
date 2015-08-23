@@ -1,3 +1,7 @@
+var booleans = {
+	'00000000': 'False',
+	'11111111': 'True'
+}
 var letters = {
 	'00000000':'a',
 	'00000001':'b',
@@ -100,5 +104,6 @@ var numbers = {
 
 module.exports = {
 	letters: letters,
-	numbers: numbers
+	numbers: numbers,
+	booleans: booleans
 }
