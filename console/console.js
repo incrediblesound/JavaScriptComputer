@@ -7,25 +7,27 @@ var consoleFactory = function(){
 	var virtualConsole = {};
 	virtualConsole.print = function(type, block){
 		var printFunc = this.types[type];
-		var currentByte
-		var value = '';
-		while(block.length){
-			currentByte = block.shift();
-			if(currentByte.length === 4){
-				currentByte = currentByte + block.shift();
-			}
-			value += printFunc(currentByte);
-		}
-		console.log(value)
+		if(typeof block === 'string'){
+      console.log(printFunc(block))
+    }
 	}
 	virtualConsole.types = {
 		'0000': function(bite){
+      if(bite.length === 4){
+        bite = '0000'+bite
+      }
 			return toValue.numbers[bite];
 		},
 		'0001': function(bite){
+      if(bite.length === 4){
+        bite = '0000'+bite
+      }
 			return toValue.letters[bite];
 		},
 		'0010': function(bite){
+      if(bite.length === 4){
+        bite = '0000'+bite
+      }
 			return toValue.booleans[bite];
 		}
 	}

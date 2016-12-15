@@ -1,26 +1,23 @@
-var program_one = [
+const program_one = [
 	['0101', '0000', '0000', '1010'], //store 10 in addr 0000
 	['0101', '0001', '0000', '0011'], //store 3 in addr 0001
 	['0110', '0000', '0001'], //add contents of 0000 and 0001
 	['1001', '0100', '0000'], //print as number
-	['1111'] //end
 ]
 
-var program_two = [
+const program_two = [
 	['0101', '0000', '0000', '1010'], //store 10 in addr 0000
 	['0101', '0001', '0000', '0011'], //store 3 in addr 0001
 	['1000', '0000', '0001'], // does 0000 value equal 0001 value
 	['1001', '0100', '0010'], // print result as boolean
-	['1111'] // end
 ]
 
-var program_three = [
+const program_three = [
 	['0101','0000','0010','0001','0000','0100','0000','1010',
 	 '0000','1010','0000','1101','0011','0101','0011','0110',
 	 '0011','0001','0000','1101','0001','0000','0000','1010',
 	 '0000','0011','0011','0111'], //store Hello, World. in addr 0000
 	['1001','0000','0001'], // print addr 0000 as text
-	['1111']
 ]
 
 module.exports = {

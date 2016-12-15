@@ -64,17 +64,17 @@ var xnor = function(a, b){
 	}
 	return returnValue;
 }
+
 var not = function(a){
 	var x = 0, y = a.length;
-	var returnValue = '';
 	for(x; x < y; x++){
 		if(isOne(a[x])){
-			returnValue += '0';
+			a[x] = '0';
 		} else {
-			returnValue += '1';
+			a[x] = '1';
 		}
 	}
-	return returnValue
+	return a
 }
 
 var xor = function(a, b){
@@ -83,12 +83,12 @@ var xor = function(a, b){
 	for(y; y >= x; y--){
 		if((isOne(a[y]) && !isOne(b[y])) ||
 		   (!isOne(a[y]) && isOne(b[y]))){
-			returnValue += '1';
+			a[y] = '1';
 		} else {
-			returnValue += '0';
+			a[y] = '0';
 		}
 	}
-	return returnValue
+	return a
 }
 
 var setToZero = function(a){

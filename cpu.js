@@ -1,101 +1,87 @@
-var memoryFactory = require('./memory');
-var operations = require('./operations');
-var os = require('./os')();
-var virtualConsole = require('./console/console')();
-var programs = require('./programs/programs');
+var operations = require('./operations')
+var virtualConsole = require('./console/console')()
 
-var cpuFactory = function(){
-	var cpu = {
-		logic: {},
-		control: {},
-		running: false
-	};
-	cpu.registerMap = {
-		'0000': [],
-		'0001': [],
-		'0010': [],
-		'0011': [],
-		'0100': []
-	},
-	cpu.instuctionStack = [];
-	cpu.start = function(){
-		while(this.running){
-			var nextCommand = this.instuctionStack.shift();
-			if(nextCommand !== undefined){
-				this.process(nextCommand);
-			}
-		}
-	}
-	cpu.loadProgram = function(array){
-		this.running = true;
-		while(array.length && this.running){
-			this.instuctionStack.push(array.shift());
-		}
-	}
-	cpu.storeAt = function(location, block){
-		this.registerMap[location] = [];
-		while(block.length){
-		this.registerMap[location].push(block.shift());
-		}
-	}
-	cpu.process = function(block, currentOperation){
-		currentOperation = currentOperation || block.shift();
-		if(currentOperation === '0101'){
-			var location = block.shift();
-			this.storeAt(location, block)
-		}
-		else if(this.logic.operations[currentOperation] !== undefined){
-			var valueOne = this.registerMap[block.shift()];
-			var valueTwo = this.registerMap[block.shift()];
-			var result = this.logic.process([currentOperation, valueOne, valueTwo]);
-			this.registerMap['0100'] = [];
-			this.registerMap['0100'].push(result);
-		}
-		else if(currentOperation === '1001'){
-			var location = block.shift();
-			var type = block.shift();
-			virtualConsole.print(type, this.registerMap[location]);
-		}
-		else if(currentOperation === '1111'){
-			this.running = false;
-		}
-	}
-	cpu.logic.process = function(block){
-		currentOperation = block.shift();
-		var valueOne, valueTwo, operationFunction;
-		valueOne = block.shift().join('');
-		if(block.length){ valueTwo = block.shift().join(''); }
-		operationFunction = this.operations[currentOperation];
-		return operationFunction(valueOne, valueTwo);
-	}
-	cpu.logic.operations = {
-		'0001': operations.and,
-		'0010': operations.or,
-		'0011': operations.not,
-		'0110': operations.add,
-		'0100': operations.xor,
-		'0111': operations.equals,
-		'1000': operations.greaterThan,
-		'1010': operations.subtract
-	}
-	return cpu;
+/* OPERATIONS */
+const STORE = '0101'
+const PRINT = '1001'
+const KILL  = '1111'
+/* REGISTERS */
+const RETURN_VAL = '0100'
+
+/* BLOCK LOCATIONS */
+const BLOCK_OPERATION = 0
+const BLOCK_LOCATION = 1
+const BLOCK_PRINT_TYPE = 2
+const BLOCK_VALUE_ONE = 1
+const BLOCK_VALUE_TWO = 2
+const BLOCK_STORE_VAL = 3
+
+const operationMap = {
+  '0001': 'and',
+  '0010': 'or',
+  '0011': 'not',
+  '0100': 'xor',
+  '0110': 'add',
+  '0111': 'equals',
+  '1000': 'greaterThan',
+  '1010': 'subtract'
 }
+
+class Cpu {
+	constructor(){
+    // this.running = false
+    this.pointer = 0
+    this.operations = operations
+  	this.registers = {
+  		'0000': [],
+  		'0001': [],
+  		'0010': [],
+  		'0011': [],
+  		'0100': []
+    }
+  	this.instuctionStack = [];
+  }
+	execute(){
+    let nextBlock = this.instuctionStack[this.pointer]
+    while(nextBlock){
+      this.process(nextBlock)
+      this.pointer++
+      nextBlock = this.instuctionStack[this.pointer]
+    }
+    this.pointer = 0
+	}
+	loadProgram(program){
+		this.instuctionStack = program.slice()
+	}
+	storeAt(location, block){
+		this.registers[location] = block[BLOCK_STORE_VAL]
+	}
+	process(block, currentOperation){
+    var location;
+		currentOperation = currentOperation || block[BLOCK_OPERATION]
+    switch(currentOperation){
+      case STORE:
+        location = block[BLOCK_LOCATION]
+        this.storeAt(location, block)
+        break
+      case PRINT:
+        location = block[BLOCK_LOCATION]
+        const type = block[BLOCK_PRINT_TYPE]
+        virtualConsole.print(type, this.registers[location])
+        break
+      default:
+        if(!this.operations[operationMap[currentOperation]]){
+          throw new Error(`Operation not found: ${currentOperation}`)
+        }
+  			const valueOne = this.registers[block[BLOCK_VALUE_ONE]]
+  			const valueTwo = this.registers[block[BLOCK_VALUE_TWO]]
+  			const result = this.operations[operationMap[currentOperation]](valueOne, valueTwo)
+  			this.registers[RETURN_VAL] = result
+    }
+	}
+}
+
+module.exports = Cpu
+
 // instruction = [['0000'],['0000'],['0000'],['0000']]
 // where [ command, value, value, value]
-/* instructions
- * and: '0001'
- * or: '0010'
- * not: '0011'
- * xor: '0100'
- * store: '0101'
- * add: '0110'
- * equals: '0111'
- * greaterThan: '1000'
- * print: '1001',
- * subtraction: 1010,
- * end: '1111'
- */
-
-var cpu = cpuFactory();
-cpu.loadProgram(programs.three);
-cpu.start();
