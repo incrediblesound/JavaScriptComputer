@@ -1,153 +1,133 @@
-var isOne = function(char){
-	return char === '1';
+const isOne = (char) => {
+  return char === '1'
 }
 
-var replaceAt = function(string, idx, unit){
-	string = string.substr(0, idx) + unit + string.substr(idx+1);
-	return string;
+const isTrue = (value) => {
+  for (var x = 0; x < value.length; x++) {
+    if (!isOne(value[x])) {
+      return false
+    }
+  }
+  return true
 }
 
-var createOne = function(len){
-	var x = 0;
-	var result = '';
-	while(x < len){
-		if(x < len-1){
-			result += '0';
-		} else {
-			result += '1';
-		}
-		x++
-	}
-	return result;
+const replaceAt = (string, idx, unit) => {
+  return `${string.substr(0, idx)}${unit}${string.substr(idx + 1)}`
+}
+
+const createOne = (size) => {
+  const result = []
+  result.length = size
+  result.fill('0')
+  result[size - 1] = '1'
+  return result.join('')
+}
+
+const createBool = (size, bool) => {
+  const result = []
+  const filler = bool ? '1' : '0'
+  result.length = size
+  result.fill(filler)
+  return result.join('')
 }
 
 // logic //
-var and = function(a, b){
-	var x = 0, y = a.length-1;
-	var returnValue = '';
-	for(y; y >= x; y--){
-		if(isOne(a[y]) && isOne(b[y])){
-			returnValue += '1';
-		} else {
-			returnValue += '0';
-		}
-	}
-	return returnValue;
+const and = (a, b) => {
+  var result = ''
+  for (let x = 0; x < a.length; x++) {
+    result += isOne(a[x]) && isOne(b[x]) ? '1' : '0'
+  }
+  return result
 }
 
-var or = function(a, b){
-	var x = 0, y = a.length-1;
-	var returnValue = '';
-	for(y; y >= x; y--){
-		if(isOne(a[y]) || isOne(b[y])){
-			returnValue += '1';
-		} else {
-			returnValue += '0';
-		}
-	}
-	return returnValue;
+const or = (a, b) => {
+  var result = ''
+  for (let x = 0; x < a.length; x++) {
+    result += isOne(a[x]) || isOne(b[x]) ? '1' : '0'
+  }
+  return result
 }
 
-var xnor = function(a, b){
-	var x = 0, y = a.length-1;
-	var returnValue = '';
-	for(y; y >= x; y--){
-		if(isOne(a[y]) && isOne(b[y])){
-			returnValue += '1';
-		}
-		else if(!isOne(a[y]) && !isOne(b[y])){
-			returnValue += '1';
-		}
-		else {
-			returnValue += '0';
-		}
-	}
-	return returnValue;
+const xnor = (a, b) => {
+  var result = ''
+  for (let y = a.length - 1; y >= 0; y--) {
+    if (isOne(a[y]) && isOne(b[y])) {
+      result += '1'
+    } else if (!isOne(a[y]) && !isOne(b[y])) {
+      result += '1'
+    } else {
+      result += '0'
+    }
+  }
+  return result
 }
 
-var not = function(a){
-	var x = 0, y = a.length;
-	for(x; x < y; x++){
-		if(isOne(a[x])){
-			a[x] = '0';
-		} else {
-			a[x] = '1';
-		}
-	}
-	return a
+const not = (a) => {
+  var result = ''
+  for (let x = 0; x < a.length; x++) {
+    result += isOne(a[x]) ? '0' : '1'
+  }
+  return result
 }
 
-var xor = function(a, b){
-	var x = 0, y = a.length-1;
-	var returnValue = '';
-	for(y; y >= x; y--){
-		if((isOne(a[y]) && !isOne(b[y])) ||
-		   (!isOne(a[y]) && isOne(b[y]))){
-			a[y] = '1';
-		} else {
-			a[y] = '0';
-		}
-	}
-	return a
+const xor = (a, b) => {
+  var result = ''
+  for (let x = 0; x < a.length; x++) {
+    result += (isOne(a[x]) && !isOne(b[x])) || (!isOne(a[x]) && isOne(b[x])) ? '1' : '0'
+  }
+  return result
 }
 
-var setToZero = function(a){
-	return xor(a, a);
+const setToZero = (a) => {
+  return xor(a, a)
 }
 
 // math //
-var add = function(a, b){
-	var x = 0, y = a.length-1;
-	var returnValue = '';
-	for(y; y >= x; y--){
-		if(isOne(a[y]) && isOne(b[y])){
-			returnValue = '0' + returnValue;
-			a = replaceAt(a, (y-1), '1');
-		} else if(isOne(a[y]) || isOne(b[y])){
-			returnValue = '1' + returnValue;
-		} else {
-			returnValue = '0' + returnValue;
-		}
-	}
-	return returnValue
+const add = (a, b) => {
+  var x = 0, y = a.length - 1
+  var result = ''
+  for (y; y >= x; y--) {
+    if (isOne(a[y]) && isOne(b[y])) {
+      result = '0' + result
+      a = replaceAt(a, (y - 1), '1')
+    } else if (isOne(a[y]) || isOne(b[y])) {
+      result = '1' + result
+    } else {
+      result = '0' + result
+    }
+  }
+  return result
 }
 
-var subtract = function(a, b){
-	b = not(b);
-	b = add(b, createOne(b.length));
-	return add(a, b);
+const subtract = (a, b) => {
+  b = not(b)
+  b = add(b, createOne(b.length))
+  return add(a, b)
 }
 
-var greaterThan = function(a, b){
-	var x = 0, y = a.length-1;
-	var returnValue = '';
-	var carry = false;
-	for(x; x < y; x++){
-		if(isOne(a[x]) && !isOne(b[x])){
-			return '11111111';
-		}
-	}
-	return '00000000';
+const greaterThan = (a, b) => {
+  for (let x = 0; x < a.length; x++) {
+    if (isOne(a[x]) && !isOne(b[x])) {
+      return createBool(a.length, true)
+    }
+  }
+  return createBool(a.length, false)
 }
 
-var equals = function(a, b){
-	var result = xnor(a, b);
-	if(result !== '11111111'){
-		return '00000000';
-	} else {
-		return result;
-	}
+const equals = (a, b) => {
+  var result = xnor(a, b)
+  return isTrue(result) ? result : createBool(a.length, false)
 }
 
 module.exports = {
-	and: and,
-	or: or,
-	xor: xor,
-	xnor: xnor,
-	not: not,
-	add: add,
-	greaterThan: greaterThan,
-	equals: equals,
-	subtract: subtract,
-	setToZero: setToZero
+  and: and,
+  or: or,
+  xor: xor,
+  xnor: xnor,
+  not: not,
+  add: add,
+  greaterThan: greaterThan,
+  equals: equals,
+  subtract: subtract,
+  setToZero: setToZero
 }
